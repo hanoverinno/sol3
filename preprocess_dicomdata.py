@@ -8,7 +8,7 @@ import pandas
 def create_csv_data():
     print "Creating csv file from dicom data"
     row_no = 0
-    with open(helpers.BASE_DIR + "dicom_data.csv", "wb") as csv_file:
+    with open(settings.BASE_DIR + "dicom_data.csv", "wb") as csv_file:
         csv_writer = csv.writer(csv_file, delimiter=";", quoting=csv.QUOTE_MINIMAL)
         csv_writer.writerow(["patient_id", "slice_no", "frame_no", "rows", "columns", "spacing", "slice_thickness", "slice_location", "slice_location2", "plane", "image_position", "sv", "time", "manufact", "modelname", "age", "birth", "sex", "file_name", "angle", "o1", "o2", "o3", "o4", "o5","o6"])
         for dicom_data in helpers.enumerate_sax_files():
@@ -83,7 +83,7 @@ def get_age_years(age_string):
 
 def enrich_dicom_csvdata():
     print "Enriching dicom csv data with extra columns and stats"
-    dicom_data = pandas.read_csv(helpers.BASE_DIR + "dicom_data.csv", sep=";")
+    dicom_data = pandas.read_csv(settings.BASE_DIR + "dicom_data.csv", sep=";")
     dicom_data["age_years"] = dicom_data["age"].apply(lambda x: get_age_years(x))
     dicom_data["patient_id_frame"] = dicom_data["patient_id"].map(str) + "_" + dicom_data["frame_no"].map(str)
     dicom_data = dicom_data.sort(["patient_id", "frame_no", "slice_location", "file_name"], ascending=[1, 1, 1, 1])
@@ -110,16 +110,16 @@ def enrich_dicom_csvdata():
     dicom_data['up_down'] = patient_grouped['time'].apply(lambda x: up_down(x, x.shift(1)))
     dicom_data['up_down_agg'] = patient_grouped["up_down"].transform(lambda x: sum(x))
 
-    dicom_data.to_csv(helpers.BASE_DIR + "dicom_data_enriched.csv", sep=";")
+    dicom_data.to_csv(settings.BASE_DIR + "dicom_data_enriched.csv", sep=";")
 
     dicom_data = dicom_data[dicom_data["frame_no"] == 1]
-    dicom_data.to_csv(helpers.BASE_DIR + "dicom_data_enriched_frame1.csv", sep=";")
+    dicom_data.to_csv(settings.BASE_DIR + "dicom_data_enriched_frame1.csv", sep=";")
 
 
 def enrich_traindata():
     print "Enriching train data with extra columns and stats"
-    train_data = pandas.read_csv(helpers.BASE_DIR + "train_validate.csv", sep=",")
-    dicom_data = pandas.read_csv(helpers.BASE_DIR + "dicom_data_enriched_frame1.csv", sep=";")
+    train_data = pandas.read_csv(settings.BASE_DIR + "train_validate.csv", sep=",")
+    dicom_data = pandas.read_csv(settings.BASE_DIR + "dicom_data_enriched_frame1.csv", sep=";")
     patient_grouped = dicom_data.groupby("patient_id")
 
     enriched_traindata = patient_grouped.first().reset_index()
@@ -133,7 +133,7 @@ def enrich_traindata():
     enriched_traindata["error_sys"] = 0
     enriched_traindata["abserr_sys"] = 0
 
-    enriched_traindata.to_csv(helpers.BASE_DIR + "train_enriched.csv", sep=";")
+    enriched_traindata.to_csv(settings.BASE_DIR + "train_enriched.csv", sep=";")
 
 
 if __name__ == "__main__":

@@ -1,4 +1,4 @@
-BASE_DIR = "."
+BASE_DIR = ".\\"
 BASE_IMAGES256_DIR = BASE_DIR + "\\data_preprocessed_images\\"
 BASE_TRAIN_SEGMENT_DIR = BASE_DIR + "\\data_segmenter_train\\"
 PATIENT_PRED_DIR = BASE_DIR + "\\data_patient_predictions\\"
