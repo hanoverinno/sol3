@@ -8,10 +8,10 @@ For detailed windows 64 installation instructions look [here]().
 The dicom data needs to be downloaded from [Kaggle](https://www.kaggle.com/c/second-annual-data-science-bowl/data) and must be but in the data_kaggle/train /validate and /test folders.
 
 #### Adjust settings
-
+In the settings.py you can adjust some parameters. The most important one is the special "quick mode". This makes training the model 5x faster at the expense of some datascience rigor. Instead of training different folds to calibrate upon to prevent overfitting we train only one fold. This overfits a bit in step 3 and 4 but still results in a solid 0.0105 score which is enough for a 3rd place on the LB. Not choosing quick mode takes much longer to train but will result in less overfit and gives 0.0101 on the LB. Which is *almost* 2nd place and maybe with some luck it is. 
 
 #### Run the solution 
-1. *python step0_preprocess.py*<br> As a result the /data_preprocessed_images folder will contain preprocessed images and some extra csv files will be generated in the root folder.
+1. *python step0_preprocess.py*<br> As a result the /data_preprocessed_images folder will contain ~329.000 preprocessed images and some extra csv files will be generated in the root folder.
 2. *python step1_train_segmenter.py*<br>As a result you will have (a) trained model(s) in the root folder
 3. *python step2_predict_volumes.py*<br>As a result you will have a csv containing raw predictions for all 1140 patients. Also the data_patient_predictions will contain all generated overlays and csv data per patient for debugging.
 4. *python step3_calibrate.py*<br>As a result you will have a csv file containing all the calibrated predictions
