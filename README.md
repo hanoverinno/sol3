@@ -13,9 +13,9 @@ In the settings.py you can adjust some parameters. The most important one is the
 #### Run the solution 
 1. *python step0_preprocess.py*<br> As a result the /data_preprocessed_images folder will contain ~329.000 preprocessed images and some extra csv files will be generated in the root folder.
 2. *python step1_train_segmenter.py*<br>As a result you will have (a) trained model(s) in the root folder. Depending on the fold RMSE should be around 0.049 (train) and 0.052 (validate).
-3. *python step2_predict_volumes.py*<br>As a result you will have a csv containing raw predictions for all 1140 patients. Also the data_patient_predictions will contain all generated overlays and csv data per patient for debugging.
-4. *python step3_calibrate.py*<br>As a result you will have a csv file containing all the calibrated predictions
-5. *python step4_submission.py*<br>As a result the /data_submission_files folder will contain a submission file.
+3. *python step2_predict_volumes.py*<br>As a result you will have a csv containing raw predictions for all 1140 patients. Also the data_patient_predictions will contain all generated overlays and csv data per patient for debugging. In the logs the average error in ml should be around 10ml.
+4. *python step3_calibrate.py*<br>As a result you will have a csv file containing all the calibrated predictions. In the logs the average error in ML should go down with +/- 1ml.
+5. *python step4_submission.py*<br>As a result the /data_submission_files folder will contain a submission file. In the logs the crps should be around 0.010.
  
 #### Hardware
 The solution should be gentle on the GPU because of the small batchsize. Any recent GPU supported by MxNet should do the job I figure.
