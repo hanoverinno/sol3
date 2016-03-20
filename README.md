@@ -17,6 +17,8 @@ The dicom data needs to be downloaded from [Kaggle](https://www.kaggle.com/c/sec
 4. python step3_calibrate.py<br>As a result you will have a csv file containing all the calibrated predictions
 5. python step4_submission.py<br>As a result the /data_submission_files folder will contain a submission file.
  
+#### Hardware
+The solution should be gentle on the GPU bacause of the small batchsize. Any recent GPU supported by MxNet should do the job I figure.
 
 
 
