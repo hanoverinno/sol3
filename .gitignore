@@ -2,3 +2,8 @@
 *.dcm
 dicom_data.csv
 *.pyc
+data_preprocessed_images/*.png
+train_enriched.csv
+dicom_data_enriched_frame1.csv
+dicom_data_enriched.csv
+data_patient_predictions/
