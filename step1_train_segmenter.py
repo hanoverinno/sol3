@@ -1,16 +1,14 @@
+import settings
 import numpy as np
 import mxnet as mx
 import logging
 from helpers_fileiter import FileIter
-import helpers
-import settings
 
 IMAGE_SIZE = settings.TARGET_CROP
 SCALE_SIZE = settings.TARGET_CROP
 INPUT_SIZE = SCALE_SIZE - settings.CROP_SIZE
 
 BATCH_SIZE = 2
-devs = [mx.gpu(0)]
 AUGMENT_TRAIN = True
 FOLD_COUNT = settings.FOLD_COUNT
 TRAIN_EPOCS = settings.TRAIN_EPOCHS
@@ -52,7 +50,7 @@ class RMSECustom(mx.metric.EvalMetric):
 
 
 def print_inferred_shape(net):
-    ar, ou, au = net.infer_shape(data=(1, 1, INPUT_SIZE, INPUT_SIZE))
+    ar, ou, au = net.infer_shape(data=(BATCH_SIZE, 1, INPUT_SIZE, INPUT_SIZE))
     print ou
 
 
@@ -102,7 +100,7 @@ def get_net_180():
     net = convolution_module(net, kernel_size, pad_size, filter_count=filter_count * 4, up_pool=True)
     net = convolution_module(net, kernel_size, pad_size, filter_count=filter_count * 4, up_pool=True)
 
-    # dirty "CROP" to wanted size...
+    # dirty "CROP" to wanted size... I was on old MxNet branch so user conv instead of crop for cropping
     net = convolution_module(net, (4, 4), (0, 0), filter_count=filter_count * 4)
     net = mx.sym.Concat(*[pool3, net])
     print_inferred_shape(net)
@@ -110,7 +108,7 @@ def get_net_180():
     net = convolution_module(net, kernel_size, pad_size, filter_count=filter_count * 4)
     net = convolution_module(net, kernel_size, pad_size, filter_count=filter_count * 4, up_pool=True)
     print_inferred_shape(net)
-    # dirty "CROP" to wanted size...
+
     net = mx.sym.Concat(*[pool2, net])
     print_inferred_shape(net)
     net = mx.sym.Dropout(net)
@@ -129,34 +127,36 @@ def get_net_180():
     return mx.symbol.LogisticRegressionOutput(data=net, name='softmax')
 
 
-network = get_net_180()
-for fold_no in range(0, settings.FOLD_COUNT):
-    if settings.QUICK_MODE:
-        if fold_no != 5:
-            print "Quick mode, skipping fold " + str(fold_no)
-            continue
+if __name__ == "__main__":
+    network = get_net_180()
+    for fold_no in range(0, settings.FOLD_COUNT):
+        if settings.QUICK_MODE:
+            if fold_no != 5:
+                print "Quick mode, skipping fold " + str(fold_no)
+                continue
 
-    print "**** TRAINING FOLD " + str(fold_no) + " ****"
-    train_model = mx.model.FeedForward(
-        ctx=devs,
-        symbol=network,
-        num_epoch=TRAIN_EPOCS,
-        learning_rate=0.001,
-        wd=0.0000000001,
-        momentum=0.99,
-        lr_scheduler=mx.lr_scheduler.FactorScheduler(step=50000, factor=0.1)
-    )
+        print "**** TRAINING FOLD " + str(fold_no) + " ****"
+        devs = [mx.gpu(0)]
+        train_model = mx.model.FeedForward(
+            ctx=devs,
+            symbol=network,
+            num_epoch=TRAIN_EPOCS,
+            learning_rate=0.001,
+            wd=0.0000000001,
+            momentum=0.99,
+            lr_scheduler=mx.lr_scheduler.FactorScheduler(step=50000, factor=0.1)
+        )
 
-    eval_metric = RMSECustom()
-    data_train = FileIter(root_dir=settings.BASE_TRAIN_SEGMENT_DIR, flist_name="train" + str(fold_no) + ".lst", batch_size=BATCH_SIZE, augment=AUGMENT_TRAIN, mean_image=settings.BASE_TRAIN_SEGMENT_DIR + "mean.png", random_crop=True, crop_size=INPUT_SIZE, shuffle=True, scale_size=None)
-    data_validate = FileIter(root_dir=settings.BASE_TRAIN_SEGMENT_DIR, flist_name="validate" + str(fold_no) + ".lst", batch_size=BATCH_SIZE, augment=False, mean_image=settings.BASE_TRAIN_SEGMENT_DIR + "mean.png", crop_size=INPUT_SIZE, scale_size=None)
-    train_model.fit(
-        X=data_train,
-        eval_data=data_validate,
-        eval_metric=eval_metric,
-        epoch_end_callback=mx.callback.do_checkpoint(MODEL_PREFIX + "fold" + str(fold_no))
-    )
+        eval_metric = RMSECustom()
+        data_train = FileIter(root_dir=settings.BASE_TRAIN_SEGMENT_DIR, flist_name="train" + str(fold_no) + ".lst", batch_size=BATCH_SIZE, augment=AUGMENT_TRAIN, mean_image=settings.BASE_TRAIN_SEGMENT_DIR + "mean.png", random_crop=True, crop_size=INPUT_SIZE, shuffle=True, scale_size=None)
+        data_validate = FileIter(root_dir=settings.BASE_TRAIN_SEGMENT_DIR, flist_name="validate" + str(fold_no) + ".lst", batch_size=BATCH_SIZE, augment=False, mean_image=settings.BASE_TRAIN_SEGMENT_DIR + "mean.png", crop_size=INPUT_SIZE, scale_size=None)
+        train_model.fit(
+            X=data_train,
+            eval_data=data_validate,
+            eval_metric=eval_metric,
+            epoch_end_callback=mx.callback.do_checkpoint(MODEL_PREFIX + "fold" + str(fold_no))
+        )
 
-print "done"
+    print "done"
 
 

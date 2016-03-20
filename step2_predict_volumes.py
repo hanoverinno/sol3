@@ -20,7 +20,6 @@ SCALE_SIZE = None
 USE_FRUSTUM_VOLUME_CALCULATIONS = True
 USE_EMPTY_FIRST_ITEMIN_FRUSTUM = True
 MODEL_EPOCH = settings.TRAIN_EPOCHS - 1
-# MODEL_EPOCH = 29
 
 PREDICTION_FILENAME = "prediction_raw_" + MODEL_NAME + ".csv"
 LOW_CONFIDENCE_PIXEL_THRESHOLD = 200
@@ -622,36 +621,36 @@ def predict_patient(patient_id, all_slice_data, pred_model_name, pred_model_iter
 
     return None
 
-# print interpolate_series([10, 40, 30, 30 ,  100, 80, 90, 70, 60, 50, 30, 20, 40, 1, 20, 10 , 5], "hallo")
 
-slice_data = pandas.read_csv(settings.BASE_DIR + "dicom_data_enriched.csv", sep=";")
-current_debug_line = ["patient", "dia_col", "sys_col", "dia_vol", "sys_vol", "dia_err", "sys_err"]
+if __name__ == "__main__":
+    slice_data = pandas.read_csv(settings.BASE_DIR + "dicom_data_enriched.csv", sep=";")
+    current_debug_line = ["patient", "dia_col", "sys_col", "dia_vol", "sys_vol", "dia_err", "sys_err"]
 
-print "\t".join(map(lambda x: str(x).rjust(10), current_debug_line))
-model_ranges = [
-    [MODEL_NAME + "fold0", MODEL_EPOCH, 1, 141],
-    [MODEL_NAME + "fold1", MODEL_EPOCH, 141, 281],
-    [MODEL_NAME + "fold2", MODEL_EPOCH, 281, 421],
-    [MODEL_NAME + "fold3", MODEL_EPOCH, 421, 561],
-    [MODEL_NAME + "fold4", MODEL_EPOCH, 561, 701],
-    [MODEL_NAME + "fold5", MODEL_EPOCH, 701, 1141]
-]
+    print "\t".join(map(lambda x: str(x).rjust(10), current_debug_line))
+    model_ranges = [
+        [MODEL_NAME + "fold0", MODEL_EPOCH, 1, 141],
+        [MODEL_NAME + "fold1", MODEL_EPOCH, 141, 281],
+        [MODEL_NAME + "fold2", MODEL_EPOCH, 281, 421],
+        [MODEL_NAME + "fold3", MODEL_EPOCH, 421, 561],
+        [MODEL_NAME + "fold4", MODEL_EPOCH, 561, 701],
+        [MODEL_NAME + "fold5", MODEL_EPOCH, 701, 1141]
+    ]
 
-for model_range in model_ranges:
-    model_name = model_range[0]
-    if settings.QUICK_MODE:
-        model_name = MODEL_NAME + "fold5"
-    model_iter = model_range[1]
-    range_start = model_range[2]
-    range_end = model_range[3]
-    print "Predicting model " + model_name
-    for i in range(range_start, range_end):
-        predict_patient(i, slice_data, model_name, model_iter, debug_info=True)
-        if len(global_dia_errors) % 20 == 0:
-            current_debug_line = ["avg", "", "", "", "", round(sum(global_dia_errors) / len(global_dia_errors), 2), round(sum(global_sys_errors) / len(global_sys_errors), 2)]
-            print "\t".join(map(lambda x: str(x).rjust(10), current_debug_line))
-    global_dia_errors = []
-    global_sys_errors = []
+    for model_range in model_ranges:
+        model_name = model_range[0]
+        if settings.QUICK_MODE:
+            model_name = MODEL_NAME + "fold5"
+        model_iter = model_range[1]
+        range_start = model_range[2]
+        range_end = model_range[3]
+        print "Predicting model " + model_name
+        for i in range(range_start, range_end):
+            predict_patient(i, slice_data, model_name, model_iter, debug_info=True)
+            if len(global_dia_errors) % 20 == 0:
+                current_debug_line = ["avg", "", "", "", "", round(sum(global_dia_errors) / len(global_dia_errors), 2), round(sum(global_sys_errors) / len(global_sys_errors), 2)]
+                print "\t".join(map(lambda x: str(x).rjust(10), current_debug_line))
+        global_dia_errors = []
+        global_sys_errors = []
 
 
 
