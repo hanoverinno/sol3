@@ -12,7 +12,7 @@ In the settings.py you can adjust some parameters. The most important one is the
 
 #### Run the solution 
 1. *python step0_preprocess.py*<br> As a result the /data_preprocessed_images folder will contain ~329.000 preprocessed images and some extra csv files will be generated in the root folder.
-2. *python step1_train_segmenter.py*<br>As a result you will have (a) trained model(s) in the root folder
+2. *python step1_train_segmenter.py*<br>As a result you will have (a) trained model(s) in the root folder. Depending on the fold RMSE should be around 0.49 (train) and 0.52 (validate).
 3. *python step2_predict_volumes.py*<br>As a result you will have a csv containing raw predictions for all 1140 patients. Also the data_patient_predictions will contain all generated overlays and csv data per patient for debugging.
 4. *python step3_calibrate.py*<br>As a result you will have a csv file containing all the calibrated predictions
 5. *python step4_submission.py*<br>As a result the /data_submission_files folder will contain a submission file.
