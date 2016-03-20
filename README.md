@@ -18,7 +18,7 @@ In the settings.py you can adjust some parameters. The most important one is the
 5. *python step4_submission.py*<br>As a result the /data_submission_files folder will contain a submission file. In the logs the crps should be around 0.010.
  
 #### Hardware
-The solution should be gentle on the GPU because of the small batchsize. Any recent GPU supported by MxNet should do the job I figure.
+The solution should be gentle on the GPU because of the small batchsize. Any recent GPU supported by MxNet should do the job I figure. The lowest card I tried (and that worked) was a GT740.
 
 
 
